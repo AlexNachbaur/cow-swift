@@ -1,0 +1,36 @@
+name: Tests
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  BuildAndTest:
+    name: Swift ${{ matrix.swift-version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        swift-version: ["6.0", "6.1", "6.2"]
+    steps:
+    - uses: actions/checkout@v4
+    - uses: swift-actions/setup-swift@v2
+      with:
+        swift-version: ${{ matrix.swift-version }}
+    - name: Get swift version
+      run: swift --version
+    - name: Lint
+      run: swift-format lint . --parallel --recursive --strict
+    - name: Build
+      run: swift build
+    - name: Test
+      run: swift test
+
