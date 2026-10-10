@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     container: swift:6.4-noble
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Lint
         run: swift format lint --recursive --strict --parallel .
 
@@ -41,7 +41,7 @@ jobs:
       matrix:
         os: [macos-15, macos-26]
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Swift version
         run: swift --version
       - name: Build
@@ -50,20 +50,24 @@ jobs:
         run: swift test --skip-build
 
   ios:
-    name: Build (iOS)
+    name: Build & Test (iOS Simulator)
     runs-on: macos-26
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.5.app/Contents/Developer
     steps:
-      - uses: actions/checkout@v5
-      - name: Build for iOS
-        # The test runner uses Swift concurrency, so the deployment target must be one that supports it.
-        run: swift build --build-tests --sdk "$(xcrun --sdk iphoneos --show-sdk-path)" --triple arm64-apple-ios15.0
+      - uses: actions/checkout@v7
+      - name: Test
+        run: |
+          xcodebuild test \
+            -scheme cow-swift \
+            -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest'
 
   thread-sanitizer:
     name: Thread sanitizer
     runs-on: ubuntu-latest
     container: swift:6.4-noble
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Test with the thread sanitizer
         run: swift test --sanitize=thread
 
