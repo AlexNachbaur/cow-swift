@@ -55,7 +55,8 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Build for iOS
-        run: swift build --build-tests --sdk "$(xcrun --sdk iphoneos --show-sdk-path)" --triple arm64-apple-ios
+        # The test runner uses Swift concurrency, so the deployment target must be one that supports it.
+        run: swift build --build-tests --sdk "$(xcrun --sdk iphoneos --show-sdk-path)" --triple arm64-apple-ios15.0
 
   thread-sanitizer:
     name: Thread sanitizer
